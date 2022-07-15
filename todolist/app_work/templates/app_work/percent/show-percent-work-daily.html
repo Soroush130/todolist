@@ -1,0 +1,304 @@
+{% extends 'shared/_MainLayout.html' %}
+
+{% block header_ref %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.8.0/chart.min.js" integrity="sha512-sW/w8s4RWTdFFSduOTGtk4isV1+190E/GghVffMA9XczdJ2MDzSzLEubKAs5h0wzgSJOQTRYyaz73L3d6RtJSg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+{% endblock header_ref %}
+
+{% block content %}
+
+    <div class="content-wrapper" style="min-height: 608px;">
+        <!-- Content Header (Page header) -->
+        <div class="content-header">
+            <div class="container-fluid">
+                <div class="row mb-2">
+                <div class="col-sm-6">
+                    <h1 class="m-0 text-dark">درصد میزان انجام فعالیت های روزانه</h1>
+                </div>
+        
+                <div class="col-sm-6">
+                    <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item"><a href="/">خانه</a></li>
+                    <li class="breadcrumb-item active">گزارشگیری روزانه</li>
+                    </ol>
+                </div>
+                </div>
+            </div>
+        </div>
+    
+        <!-- Main content -->
+        <section class="content">
+            <div class="container-fluid">
+
+                <div class="row">
+                    <div class="col-lg-3">
+                        <div class="card card-primary">
+                            <div class="card-header">
+                            <h3 class="card-title float-left">تاریخ مد نظر خود را انتخاب کنید</h3>
+                            </div>
+                                <div class="card-body">
+                                    <div class="form-group">
+                                    <label for="inputDate">تاریخ : </label>
+                                    <input type="month" class="form-control" id="inputDate" name="month">
+                                    </div>
+                                </div>
+                                <!-- /.card-body -->
+                
+                                <div class="card-footer">
+                                    <button type="button" id='getReport' class="btn btn-primary">گزارش</button>
+                                </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-9">
+                        <div class="card">
+                            <div class="card-header">
+                              <h3 class="card-title"></h3>
+              
+                              <div class="card-tools">
+                                <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i>
+                                </button>
+                              </div>
+                            </div>
+                            <div class="card-body">
+                              <div class="chart">
+                                <div class="chartjs-size-monitor">
+                                    <div class="chartjs-size-monitor-expand">
+                                        <div class=""></div>
+                                    </div>
+                                    <div class="chartjs-size-monitor-shrink">
+                                        <div class=""></div>
+                                    </div>
+                                </div>
+                                <canvas id="barChart" style="height: 150px; display: block; width: 150px;" class="chartjs-render-monitor"></canvas>
+                              </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="card">
+                            <div class="card-header">
+                              <h3 class="card-title">Bar Chart</h3>
+              
+                              <div class="card-tools">
+                                <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i>
+                                </button>
+                              </div>
+                            </div>
+                            <div class="card-body">
+                                <canvas id="BarChart" width="400" height="400"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+            </div>
+        </section>
+    </div>
+
+  
+
+{% endblock content %}
+
+{% block footer_ref %}
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+<script>
+    
+    let button_get_report = document.querySelector("#getReport");
+    let input_date = document.querySelector('#inputDate');
+    button_get_report.addEventListener("click", GetREport);
+
+    
+    function GetREport(){
+        let val = input_date.value;
+        $.ajax({
+            type: "GET",
+            url: "{% url 'work:calc_percent_work_daily' %}",
+            data: {value_date: val},
+            // on success
+            success: function (response) {
+                if (response.resulte == true) {
+                    let labels_chart = [];
+                    let count_all_work = [];
+                    let count_is_finished_work = [];
+                    const db = response.db;
+                    let list_percent = [];
+                    
+                    //////////////////  Section First Chart //////////////////////
+                    for (let i=0; i<response.list_date_days_type_string.length; i++){
+                        labels_chart.push(response.list_date_days_type_string[i])
+                    }
+
+                    for (const [key, value] of Object.entries(db)) {
+                        count_all_work.push(value[0])
+                        count_is_finished_work.push(value[1])
+                    }
+                    //////////////////
+                    // Calc percent
+                    for (let i=0; i<response.db_percent_finish_work.length; i++){
+                        list_percent.push(response.db_percent_finish_work[i])
+                    }
+
+                    // functions
+                    SecondChart(labels_chart, list_percent)
+                    FirstChart(labels_chart, count_all_work, count_is_finished_work)
+
+                    ///////////////////////////////////////////////////////////////////////
+                    
+                } else {
+                    console.log('Not Done Work')
+                }
+            },
+            // on error
+            error: function (response) {
+                // alert the error if any error occured
+                console.log(response)
+            }
+        });
+    };
+
+
+    // Double Bar Chart
+    function FirstChart(labels_chart, count_all_work, count_is_finished_work){
+        
+        var areaChartData = {
+            labels  : labels_chart,
+            datasets: [
+              {
+                // soton blue
+                label               : 'تعداد کار های انجام شده',
+                backgroundColor     : 'rgba(60,141,188,0.9)',
+                borderColor         : 'rgba(60,141,188,0.8)',
+                pointRadius          : false,
+                pointColor          : '#3b8bba',
+                pointStrokeColor    : 'rgba(60,141,188,1)',
+                pointHighlightFill  : '#fff',
+                pointHighlightStroke: 'rgba(60,141,188,1)',
+                data                : count_is_finished_work
+              },
+              {
+                // soton gray
+                label               : 'تعداد کل کار ها',
+                backgroundColor     : 'rgba(210, 214, 222, 1)',
+                borderColor         : 'rgba(210, 214, 222, 1)',
+                pointRadius         : false,
+                pointColor          : 'rgba(210, 214, 222, 1)',
+                pointStrokeColor    : '#c1c7d1',
+                pointHighlightFill  : '#fff',
+                pointHighlightStroke: 'rgba(220,220,220,1)',
+                data                : count_all_work
+              },
+            ]
+        }
+      
+        var barChartCanvas = $('#barChart').get(0).getContext('2d')
+        var barChartData = jQuery.extend(true, {}, areaChartData)
+        var temp0 = areaChartData.datasets[0]
+        var temp1 = areaChartData.datasets[1]
+        barChartData.datasets[0] = temp1
+        barChartData.datasets[1] = temp0
+    
+        var barChartOptions = {
+          responsive              : true,
+          maintainAspectRatio     : false,
+          datasetFill             : false
+        }
+    
+        var barChart = new Chart(barChartCanvas, {
+          type: 'bar', 
+          data: barChartData,
+          options: {
+                scales: {
+                    yAxes: [{
+                        display: true,
+                        ticks: {
+                            beginAtZero: true,
+                            steps: 1,
+                            stepValue: 1,
+                            //max: Math.ceil(parseInt(response.count_all_work_to_date)/5)*5
+                            max:10
+                        }
+                    }]
+                }
+            }
+        })
+    
+        var stackedBarChart = new Chart(stackedBarChartCanvas, {
+          type: 'bar', 
+          data: stackedBarChartData,
+          options: {
+                scales: {
+                    yAxes: [{
+                        display: true,
+                        ticks: {
+                            beginAtZero: true,
+                            steps: 1,
+                            stepValue: 1,
+                            //max: Math.ceil(parseInt(response.count_all_work_to_date)/5)*5
+                            max:10
+                        }
+                    }]
+                }
+            }
+        })
+        return true
+    };
+
+
+    // Bar Chart
+    function SecondChart(labels_chart, list_percent){
+        var one = document.getElementById('BarChart').getContext('2d');
+
+        var BarChart = new Chart(one, {
+            type: 'bar',
+            data: {
+                labels: labels_chart,
+                datasets: [{
+                    label: 'مشاهده درصد کارهای انجام شده',
+                    data: list_percent,
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.2)',
+                        'rgba(54, 162, 235, 0.2)',
+                        'rgba(255, 206, 86, 0.2)',
+                        'rgba(75, 192, 192, 0.2)',
+                        'rgba(153, 102, 255, 0.2)',
+                        'rgba(255, 159, 64, 0.2)'
+                    ],
+                    borderColor: [
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 206, 86, 1)',
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(153, 102, 255, 1)',
+                        'rgba(255, 159, 64, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    yAxes: [{
+                        display: true,
+                        ticks: {
+                            beginAtZero: true,
+                            //max: Math.ceil(parseInt(response.count_all_work_to_date)/5)*5
+                            max:100
+                        }
+                    }]
+                }
+            }
+        });
+    };
+
+
+
+</script>
+
+
+{% endblock footer_ref %}

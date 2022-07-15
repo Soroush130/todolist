@@ -1,0 +1,95 @@
+{% extends 'shared/_MainLayout.html' %} 
+{%load static%} 
+
+
+{% block content %} 
+
+<!-- Content Wrapper. Contains page content -->
+<div class="content-wrapper">
+  <!-- Content Header (Page header) -->
+  <div class="content-header">
+    <div class="container-fluid">
+      <div class="row mb-2">
+        <div class="col-sm-6">
+          <h1 class="m-0 text-dark">لیست پیام ها</h1>
+        </div>
+
+        <div class="col-sm-6">
+          <ol class="breadcrumb float-sm-right">
+            <li class="breadcrumb-item"><a href="/">خانه</a></li>
+            <li class="breadcrumb-item active">پیام ها</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main content -->
+  <section class="content">
+    <div class="container-fluid">
+      <div class="row">
+
+        <div class="col-md-2"></div>    
+
+        <div class="col-md-7">
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title float-left">جدول پیام ها</h3>
+            </div>
+            <!-- /.card-header -->
+            <div class="card-body p-0">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 10px">#</th>
+                    <th>فرستنده</th>
+                    <th>توضیحات</th>
+                    <th>تاریخ</th>
+                    <th>حذف</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for message in messages %}
+                  <tr>
+                    <td>{{forloop.counter}}</td>
+                    <td>{{message.from_user}}</td>
+                    <td>
+                      <p>{{message.body}}</p>
+                    </td>
+                    <td>
+                      <h6>{{message.date}}</h6>
+                    </td>
+                    <td>
+                      <h6 class="text-center">
+                        <a
+                          href="{% url 'message:delete_messsage' message.id %}"
+                          style="text-decroution: noen"
+                        >
+                          <i class="fa fa-trash" style="color: red"></i>
+                        </a>
+                      </h6>
+                    </td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+            <!-- /.card-body -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+{% endblock content %}
+
+{% block footer_ref %}
+    <script>
+    let text = document.querySelector("#messageAleart");
+
+    let timer = setTimeout(() => {
+        text.remove();
+    }, 3600);
+    </script>
+{% endblock footer_ref %}

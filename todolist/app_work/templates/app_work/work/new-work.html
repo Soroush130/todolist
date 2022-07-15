@@ -1,0 +1,254 @@
+{% extends 'shared/_MainLayout.html' %} {% load static %}
+
+{% block header_ref %}
+    <style>
+        #messageAleart {
+            position: absolute;
+            left: 1%;
+            top: 8%;
+            z-index: 2000;
+            width: 300px;
+            height: 80px;
+            display: flex;
+            justify-content: start;
+            flex-direction: row;
+            align-items: center;
+            border-radius: 20px;
+        }
+    </style>
+{% endblock header_ref %}
+
+{% block content %}
+
+    {% if messages %}
+        {% for message in messages %}
+            <div id='messageAleart' class='bg-{{ message.tags }}' style='opacity: 0.8;'>
+                {% if message.tags == 'success' %}
+                    <i class='fa fa-check ml-3' style='font-size:35px;'></i>
+                {% elif message.tags == 'danger' %}
+                    <i class='fa fa-close ml-3' style='font-size:35px;'></i>
+                {% endif %}
+                <h5 class='mx-2' style=''>{{ message }}</h5>
+            </div>
+        {% endfor %}
+    {% endif %}
+
+
+    <div class="content-wrapper">
+        <!-- Content Header (Page header) -->
+        <div class="content-header">
+            <div class="container-fluid">
+                <div class="row mb-2">
+                    <div class="col-sm-6">
+                        <h1 class="m-0 text-dark">فعالیت ها</h1>
+                    </div>
+
+                    <div class="col-sm-6">
+                        <ol class="breadcrumb float-sm-right">
+                            <li class="breadcrumb-item"><a href="/">خانه</a></li>
+                            <li class="breadcrumb-item active">فعالیت جدید</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main content -->
+        <section class="content">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="card card-primary">
+                            <div class="card-header">
+                                <h3 class="card-title float-left">فعالیت جدید </h3>
+                            </div>
+                            <!-- /.card-header -->
+                            <!-- form start -->
+                            <form role="form" action="" method="POST">
+                                {% csrf_token %}
+                                <div class="card-body">
+
+                                    <div class="form-group">
+                                        <label for="exampleInputTitle">عنوان :</label>
+                                        <input
+                                                type="text"
+                                                name="title"
+                                                class="form-control"
+                                                id="exampleInputTitle"
+                                                placeholder="ورزش کردن , مطالعه کردن , ..."
+                                        />
+                                    </div>
+                                    <div class="form-group">
+                                        <label>توضیحات : </label>
+                                        <textarea class="form-control" name="body" rows="3"
+                                                  placeholder="توضیحات خورد را وارد کنید"></textarea>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="InputStartWork">زمان شروع : </label>
+                                        <input type="datetime-local" class="form-control" name="start_work"
+                                               id="InputStartWork">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="InputFinishWork">زمان پایان : </label>
+                                        <input type="datetime-local" class="form-control" name="end_work"
+                                               id="InputFinishWork">
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>نوع کار :</label>
+                                        <small>نوع کار خود را انتخاب کنید</small>
+                                        <select name="type_work" multiple="" class="form-control">
+                                            {% for type in type_works %}
+                                                <option value="{{ type.id }}">{{ type.title }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>تگ :</label>
+                                        <select name="tag" class="form-control" multiple>
+                                            {% for tag in tags %}
+                                                <option value="{{ tag.id }}">{{ tag.title }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                </div>
+                                <!-- /.card-body -->
+
+                                <div class="card-footer">
+                                    <button type="submit" class="btn btn-primary">ثبت</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+
+                    <!-- /.col -->
+                    <div class="col-md-8 connectedSortable ui-sortable">
+
+                        <div class="card">
+                            <div class="card-header">
+                              <h3 class="card-title float-left">لیست کارها</h3>
+                            </div>
+                            <!-- /.card-header -->
+                            <div class="card-body table-responsive p-0" style="height: 300px;">
+                              <table class="table table-head-fixed">
+                                <thead>
+                                  <tr>
+                                    <th>#</th>
+                                    <th>عنوان</th>
+                                    <th>تاریخ شروع</th>    
+                                    <th>تاریخ پایان</th>    
+                                    <th>انجام شده/نشده</th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  
+                                    {% for work in works %}
+                                    
+                                        <tr>
+                                            <td>{{forloop.counter}}</td>
+                                            <td class="work-title" data-catid="{{work.id}}">
+                                                {{work.title}}
+                                            <td>
+                                                {{work.get_start_time}}
+                                                <br>
+                                                {{work.get_start_date}}
+                                            </td>
+                                            <td>
+                                                {{work.get_end_time}}
+                                                <br>
+                                                {{work.get_end_date}}
+                                            </td>
+                                            <td>
+                                                <span class="tag tag-success">
+                                                    {% comment %} <input type="checkbox" id="checkbox" data-catid="14"> {% endcomment %}
+                                                    <input type="checkbox" name="todo{{ work.id }}" id="todoCheck{{ work.id }}" data-catid="{{ work.id }}"
+                                                        {% if work.is_finished %}checked{% endif %}
+                                                    />
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    
+                                    {% endfor %}
+                                  
+                                </tbody>
+                              </table>
+                            </div>
+                            <!-- /.card-body -->
+                          </div>
+                    </div>
+                    <!-- /.col -->
+                </div>
+            </div>
+        </section>
+    </div>
+
+{% endblock %}
+
+
+
+{% block footer_ref %}
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+    <script>
+
+        var inputs_chek = document.querySelectorAll('input[type="checkbox"]');
+        for (let i = 0; i < inputs_chek.length; i++) {
+            let item = inputs_chek[i];
+            item.addEventListener('click', myFunc)
+        }
+
+        function myFunc(e) {
+            var id;
+            id = this.getAttribute('data-catid');
+            $.ajax({
+                type: "GET",
+                url: "{% url 'work:check_work' %}",
+                data: {work_id: id},
+                // on success
+                success: function (response) {
+                    if (response.is_finished == true) {
+                        let work_title = document.querySelectorAll(".work-title");
+                        for (let i=0; i<work_title.length; i++){
+                            let data_catid = work_title[i].getAttribute('data-catid')
+                            if (id == data_catid){
+                                let title = work_title[i]
+                                title.style.textDecoration = 'line-through';
+                            }
+                        }
+                    } else {
+                        let work_title = document.querySelectorAll(".work-title");
+                        for (let i=0; i<work_title.length; i++){
+                            let data_catid = work_title[i].getAttribute('data-catid')
+                            if (id == data_catid){
+                                let title = work_title[i]
+                                title.style.textDecoration = '';
+                            }
+                        }
+                    }
+                },
+                // on error
+                error: function (response) {
+                    // alert the error if any error occured
+                    console.log(response)
+                }
+            });
+        }
+
+    </script>
+
+
+    <script>
+
+        let text = document.querySelector("#messageAleart");
+
+        let timer = setTimeout(() => {
+            text.remove()
+        }, 3600);
+
+    </script>
+
+
+{% endblock footer_ref %}

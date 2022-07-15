@@ -1,0 +1,12 @@
+<ul class="nested">
+    {% for tag in tag.children.all %}
+        <li>
+            <span class="caret">{{tag.title}}</span>
+            {% if tag.children.all %}
+                {% include 'app_work/tag/tags-category-loop.html' %}
+            {% endif %}
+        </li>
+
+    {% endfor %}
+</ul>
+

@@ -1,0 +1,120 @@
+{% extends 'shared/_MainLayout.html' %}
+
+{% block header_ref %}
+    <style>
+
+    </style>
+{% endblock %}
+
+{% block content %}
+
+    <div class="content-wrapper">
+
+        <section class="content-header">
+            <div class="container-fluid">
+                <div class="row mb-2">
+                    <div class="col-sm-6">
+                        <h1>
+                            {% if score.day %}
+                                ویرایش روز  {{ score.day }}
+                            {% else %}
+                                ویرایش ماه {{ score.month }}
+                            {% endif %}
+                        </h1>
+                    </div>
+                    <div class="col-sm-6">
+                        <ol class="breadcrumb float-sm-right">
+                            <li class="breadcrumb-item"><a href="/">خانه</a></li>
+                            <li class="breadcrumb-item active">ویرایش امتیاز</li>
+                        </ol>
+                    </div>
+                </div>
+            </div><!-- /.container-fluid -->
+        </section>
+
+        <section class="content">
+            <div class="container-fluid">
+                <div class="row">
+
+                    <div class="col-md-8">
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title float-left">
+                                    {% if score.day %}
+                                        لیست کار های روز   {{ score.day }}
+                                    {% else %}
+                                        لیست کار های ماه {{ score.month }}
+                                    {% endif %}
+                                </h3>
+                            </div>
+                            <!-- /.card-header -->
+                            <div class="card-body p-0">
+                                <table class="table table-condensed">
+                                    <thead>
+                                    <tr>
+                                        <th style="width: 10px">#</th>
+                                        <th>عنوان</th>
+                                        <th>توضیحات</th>
+                                        <th>زمان شروع</th>
+                                        <th>زمان پایان</th>
+                                        <th>انجام شده/نشده</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    {% for work in works %}
+                                        <tr>
+                                            <td>{{ forloop.counter }}</td>
+                                            <td>{{ work.title }}</td>
+                                            <td>{{ work.body|truncatewords:5 }}</td>
+                                            <td>{{ work.start_work }}</td>
+                                            <td>{{ work.end_work }}</td>
+                                            <td style="margin-left: 10px">
+                                                {% if work.is_finished %}
+                                                    <i class="fa fa-check" style="color: green"></i>
+                                                {% else %}
+                                                    <i class="fa fa-close" style="color: red"></i>
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                            <!-- /.card-body -->
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="card card-primary">
+                            <div class="card-header">
+                                <h3 class="card-title float-left">تغییر امتیاز</h3>
+                            </div>
+
+                            <form role="form" method="POST" action="/work/score-edit/{{ score.id }}/">
+                                {% csrf_token %}
+                                <div class="card-body">
+                                    <div class="form-group">
+                                        <label for="Score">امتیاز جدید : </label>
+                                        <input type="number" name="rate" class="form-control" id="Score"
+                                               min="0" max="100" placeholder="امتیاز قبلی شما {{ score.rate }}">
+                                    </div>
+                                </div>
+
+                                <div class="card-footer">
+                                    <button type="submit" class="btn btn-primary">ثبت</button>
+                                    <a href="/work/score-delete/{{ score.id }}/" class="btn btn-danger">حذف</a>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+    </div>
+{% endblock %}
+
+{% block footer_ref %}
+
+
+{% endblock %}

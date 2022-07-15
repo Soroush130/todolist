@@ -1,0 +1,218 @@
+{% load static %}
+
+<!-- Navbar -->
+<nav class="main-header navbar navbar-expand navbar-white navbar-light">
+    <!-- Left navbar links -->
+    <ul class="navbar-nav">
+        <li class="nav-item">
+            <a class="nav-link" data-widget="pushmenu" href="#"
+            ><i class="fas fa-bars"></i
+            ></a>
+        </li>
+        <li class="nav-item d-none d-sm-inline-block">
+            <a href="/" class="nav-link">Home</a>
+        </li>
+        <li class="nav-item d-none d-sm-inline-block">
+            <a href="{% url 'account:logout' %}" class="nav-link">Logout</a>
+        </li>
+    </ul>
+
+</nav>
+<!-- /.navbar -->
+
+<!-- Main Sidebar Container -->
+<aside class="main-sidebar sidebar-dark-primary elevation-4">
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <!-- Sidebar user panel (optional) -->
+        <div class="user-panel mt-3 pb-3 mb-3 d-flex">
+            {% comment %}
+                <div class="image">
+                    <img
+                            src="{% static 'adminlte/dist/img/user2-160x160.jpg' %}"
+                            class="img-circle elevation-2"
+                            alt="User Image"
+                    />
+                </div> {% endcomment %}
+            <div class="info">
+                <a href="{% url 'home' %}" class="d-block">{{ request.user.get_full_name }}</a>
+            </div>
+        </div>
+
+        <!-- Sidebar Menu -->
+        <nav class="mt-2">
+            <ul
+                    class="nav nav-pills nav-sidebar flex-column"
+                    data-widget="treeview"
+                    role="menu"
+                    data-accordion="false"
+            >
+                <!-- Add icons to the links using the .nav-icon class
+                       with font-awesome or any other icon font library -->
+
+                       <li class="nav-item has-treeview">
+                        <a href="#" class="nav-link">
+                            <i class="nav-icon fas fa-tachometer-alt"></i>
+                            <p>
+                                داشبورد
+                                <i class="right fas fa-angle-left"></i>
+                            </p>
+                        </a>
+                        <ul class="nav nav-treeview" style="display: none;">
+                            <li class="nav-item">
+                                <a href="{% url 'account:edit_profile' %}" class="nav-link">
+                                    <i class="nav-icon fas fa-edit"></i>
+                                    <p>ویرایش پروفایل</p>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+
+                <li class="nav-item">
+                    <a href="{% url 'work:add_work' %}" class="nav-link">
+                        <i class="nav-icon fas fa-edit"></i>
+                        <p>
+                            فعالیت جدید
+                            {% comment %} <span class="right badge badge-danger">New</span> {% endcomment %}
+                        </p>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a href="{% url 'work:tags' %}" class="nav-link">
+                        <i class="nav-icon fas fa-th"></i>
+                        <p>
+                            تگ ها
+                        </p>
+                    </a>
+                </li>
+
+                <li class="nav-item has-treeview">
+                    <a href="#" class="nav-link">
+                        <i class="nav-icon fas fa-chart-pie"></i>
+                        <p>
+                            گزارش گیری
+                            <i class="right fas fa-angle-left"></i>
+                        </p>
+                    </a>
+                    <ul class="nav nav-treeview" style="display: none;">
+                        <li class="nav-item">
+                            <a href="{% url 'work:reporting_tag' %}" class="nav-link">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>
+                                    بر اساس تگ ها
+                                </p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{% url 'work:show_percent_work_daily_to_bar' %}" class="nav-link">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>میزان انجام فعالیت ها</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{% url 'work:show_percent_work_daily_to_circle' %}" class="nav-link">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>میزان درصد انجام کار ها  </p>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+
+                <li class="nav-item">
+                    <a href="{% url 'reminder:reminders' %}" class="nav-link">
+                        <i class="nav-icon fas fa-edit"></i>
+                        <p>
+                            ثبت یادآوری
+                        </p>
+                    </a>
+                </li>
+
+                <li class="nav-item has-treeview">
+                    <a href="#" class="nav-link">
+                        <i class="nav-icon fas fa-th"></i>
+                        <p>
+                            برنامه ورزشی
+                            <i class="right fas fa-angle-left"></i>
+                        </p>
+                    </a>
+                    <ul class="nav nav-treeview" style="display: none;">
+                        <li class="nav-item">
+                            <a href="{% url 'sport_program:get_sport_programs' %}" class="nav-link">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>دریافت برنامه ورزشی</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{% url 'sport_program:new_customize_program' %}" class="nav-link">
+                                <i class="nav-icon fas fa-edit"></i>
+                                <p>ایجاد برنامه ورزشی شخصی</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{% url 'sport_program:list_program_sport' %}" class="nav-link">
+                                <i class="nav-icon fas fa-book"></i>
+                                <p>لیست برنامه های ورزشی</p>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+
+                <li class="nav-item">
+                    <a href="{% url 'note:notes' %}" class="nav-link">
+                        <i class="nav-icon fas fa-edit"></i>
+                        <p>
+                            یادداشت نویسی
+                        </p>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a href="{% url 'work:scoring' %}" class="nav-link">
+                        <i class="nav-icon fas fa-th"></i>
+                        <p>
+                            امتیاز دهی
+                        </p>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a href="{% url 'water:water_daily' %}" class="nav-link">
+                        <i class="nav-icon fas fa-th"></i>
+                        <p>
+                            آب روزانه
+                        </p>
+                    </a>
+                </li>
+
+                <li class="nav-item has-treeview">
+                    <a href="#" class="nav-link">
+                        <i class="nav-icon far fa-envelope"></i>
+                        <p>
+                            پیام ها
+                            <i class="right fas fa-angle-left"></i>
+                        </p>
+                    </a>
+                    <ul class="nav nav-treeview" style="display: none;">
+                        <li class="nav-item">
+                            <a href="{% url 'message:send_message' %}" class="nav-link">
+                                <i class="nav-icon fas fa-edit"></i>
+                                <p>نوشتن پیام</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{% url 'message:message_list' %}" class="nav-link">
+                                <i class="nav-icon fas fa-book"></i>
+                                <p>لیست پیام ها</p>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+
+            </ul>
+        </nav>
+        <!-- /.sidebar-menu -->
+    </div>
+    <!-- /.sidebar -->
+</aside>

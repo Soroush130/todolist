@@ -1,0 +1,92 @@
+{% extends 'shared/_MainLayout.html' %}
+
+{% block content %}
+
+
+<div class="content-wrapper">
+    <div class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+              <div class="col-sm-6">
+                <h1 class="m-0 text-dark"> لیست برنامه های ورزشی شما</h1>
+              </div>
+      
+              <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                  <li class="breadcrumb-item"><a href="/">خانه</a></li>
+                  <li class="breadcrumb-item active">برنامه ورزشی</li>
+                </ol>
+              </div>
+            </div>
+          </div>
+    </div>
+
+    
+    <section class="content">
+        <div class="container-fluid">
+            <div class="row">
+
+                <div class="col-md-2"></div>
+                
+    
+                <div class="col-md-8">
+                  <div class="card">
+                    <div class="card-header">
+                      <h3 class="card-title"></h3>
+    
+                        <div class="card-tools">
+                            <h4>برنامه ورزشی</h4>
+                        </div>
+                    </div>
+                    <!-- /.card-header -->
+                    <div class="card-body p-0">
+                      <table class="table">
+                        <thead>
+                          <tr>
+                            <th style="width: 10px">#</th>
+                            <th>عنوان</th>
+                            <th>ایتم ها</th>
+                            <th>حذف</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {% for program in programs %}
+                            <tr>
+                              <td>{{forloop.counter}}</td>
+                              <td>
+                                <a href="{% url 'sport_program:detail_program_sport' program.id %}">
+                                  {{program.titel}}
+                                </a>
+                              </td>
+                              <td>
+                                  {% for item in program.item.all %}
+                                    {{item.title}} {% if not forloop.last %}|{% endif %}
+                                  {% endfor %}
+                              </td>
+                              <td>
+                                <h6>
+                                  <a href="{% url 'sport_program:delete_program_sport' program.id %}" style='text-decroution:noen;'>
+                                    <i class="fa fa-trash" style='color:red;'></i>
+                                  </a>
+                                </h6>
+                              </td>
+                            </tr>
+                          {% endfor %}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+               </div>
+    
+               <div class="col-md-2"></div>
+    
+            </div>
+        </div>
+    </section>
+</div>
+
+
+
+
+
+{% endblock content %}

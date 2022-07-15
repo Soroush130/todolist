@@ -1,0 +1,177 @@
+{% extends 'shared/_MainLayout.html' %}
+{%load static%}
+
+{% block header_ref %}
+  <style>
+    #messageAleart{
+      position: absolute;
+      left:1%;
+      top:8%;
+      z-index: 2000;
+      width: 300px;
+      height: 80px;
+      display: flex;
+      justify-content: start;
+      flex-direction:row;
+      align-items: center;
+      border-radius:20px;
+    }
+  </style>
+{%endblock header_ref %}
+
+{% block content %}
+
+{% if messages %}
+  {% for message in messages %}
+    <div id='messageAleart' class='bg-{{ message.tags }}' style='opacity: 0.8;'>
+      {% if message.tags == 'success' %}
+        <i class='fa fa-check ml-3' style='font-size:35px;'></i>
+      {% elif message.tags == 'danger' %}
+        <i class='fa fa-close ml-3' style='font-size:35px;'></i>
+      {% endif %}
+      <h5 class='mx-2' style=''>{{message}}</h5>
+    </div>
+  {% endfor %}
+{% endif %}
+
+<!-- Content Wrapper. Contains page content -->
+<div class="content-wrapper">
+
+    <!-- Content Header (Page header) -->
+    <div class="content-header">
+      <div class="container-fluid">
+        <div class="row mb-2">
+          <div class="col-sm-6">
+            <h1 class="m-0 text-dark">یادداشت نویسی</h1>
+          </div>
+  
+          <div class="col-sm-6">
+            <ol class="breadcrumb float-sm-right">
+              <li class="breadcrumb-item"><a href="/">خانه</a></li>
+              <li class="breadcrumb-item active">یادداشت ها</li>
+            </ol>
+          </div>
+        </div>
+      </div>
+    </div>
+  
+    <!-- Main content -->
+    <section class="content">
+      <div class="container-fluid">
+  
+        <div class="row">
+
+          <div class="col-md-5">
+            <div class="card card-primary">
+              <div class="card-header">
+                <h3 class="card-title float-left">یادداشت جدید</h3>
+              </div>
+              <!-- /.card-header -->
+              <!-- form start -->
+              <form action='/note/add-note/' method="POST">
+                {% csrf_token %}
+
+                <div class="card-body">
+
+                  <div class="form-group">
+                    <label for="InputTitle">* عنوان : </label>
+                    <input name="title" type="text" class="form-control" id="InputTitle" placeholder="عنوان مورد نظر را وارد کنید">
+                  </div>
+
+                  <div class="form-group">
+                    <div class="form-group">
+                      <label>* توضیحات : </label>
+                      <textarea class="form-control" name="body" rows="3" placeholder="توضیحات ..."></textarea>
+                    </div>
+                  </div>
+
+                  <div class="bootstrap-timepicker">
+                    <div class="form-group">
+                      <label>زمان : </label>
+
+                      <div class="input-group date" id="timepicker" data-target-input="nearest">
+                        <input type="text" name="date" class="form-control datetimepicker-input" data-target="#timepicker">
+                        <div class="input-group-append" data-target="#timepicker" data-toggle="datetimepicker">
+                          <div class="input-group-text"><i class="far fa-clock"></i></div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="card-footer">
+                  <button type="submit" class="btn btn-primary" id='createButton'>Submit</button>
+                </div>
+              </form>
+            </div>
+          </div>
+  
+
+          <div class="col-md-7">
+              <div class="card">
+                <div class="card-header">
+                  <h3 class="card-title float-left">جدول یادداشت ها</h3>
+                </div>
+                <!-- /.card-header -->
+                <div class="card-body p-0">
+                  <table class="table">
+                    <thead>
+                      <tr>
+                        <th style="width: 10px">#</th>
+                        <th>عنوان</th>
+                        <th>توضیحات</th>
+                        <th>تاریخ</th>
+                        <th>ویرایش/حذف</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {% for note in notes %}
+                        <tr>
+                          <td>{{forloop.counter}}</td>
+                          <td>{{note.title}}</td>
+                          <td>
+                            <p>{{note.body|truncatewords:5}}</p>
+                          </td>
+                          <td>
+                            <h6>{{note.date}}</h6>
+                          </td>
+                          <td>
+                            <h6 class='text-center'>
+                              <a href="{% url 'note:delete_note' note.id %}" style='text-decroution:noen;'>
+                                <i class="fa fa-trash" style='color:red;'></i>
+                              </a>
+                            </h6>
+                          </td>
+                        </tr>
+                      {% endfor %}
+                    </tbody>
+                  </table>
+                </div>
+                <!-- /.card-body -->
+              </div>
+          </div>
+
+        </div>
+      </div>
+    
+    </section>
+  
+  </div>
+
+
+
+
+  
+{% endblock content %}
+
+
+
+{% block footer_ref %}
+<script>  
+
+  let text = document.querySelector("#messageAleart");
+
+  let timer = setTimeout(() => {text.remove()}, 3600);
+
+</script>
+{% endblock footer_ref %}

@@ -1,0 +1,253 @@
+{% extends 'shared/_MainLayout.html' %}
+
+{% block header_ref %}
+    <style>
+        #messageAleart {
+            position: absolute;
+            left: 1%;
+            top: 8%;
+            z-index: 2000;
+            width: 300px;
+            height: 80px;
+            display: flex;
+            justify-content: start;
+            flex-direction: row;
+            align-items: center;
+            border-radius: 20px;
+        }
+    </style>
+{% endblock header_ref %}
+
+
+{% block content %}
+
+    {% if messages %}
+        {% for message in messages %}
+            <div id='messageAleart' class='bg-{{ message.tags }}' style='opacity: 0.8;'>
+                {% if message.tags == 'success' %}
+                    <i class='fa fa-check ml-3' style='font-size:35px;'></i>
+                {% elif message.tags == 'danger' %}
+                    <i class='fa fa-close ml-3' style='font-size:35px;'></i>
+                {% endif %}
+                <h5 class='mx-2' style=''>{{ message }}</h5>
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <div class="content-wrapper">
+
+        <section class="content-header">
+            <div class="container-fluid">
+                <div class="row mb-2">
+                    <div class="col-sm-6">
+                        <h1>امتیاز دهی ( روز یا ماه )</h1>
+                    </div>
+                    <div class="col-sm-6">
+                        <ol class="breadcrumb float-sm-right">
+                            <li class="breadcrumb-item"><a href="/">خانه</a></li>
+                            <li class="breadcrumb-item active">بخش امتیاز دهی</li>
+                        </ol>
+                    </div>
+                </div>
+            </div><!-- /.container-fluid -->
+        </section>
+
+        <section class="content">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-md-4">
+                        <!-- general form elements disabled -->
+                        <div class="card card-secondary">
+                            <!-- /.card-header -->
+                            <div class="card-body">
+                                <form role="form" action="{% url 'work:scoring' %}" method="POST">
+                                    {% csrf_token %}
+                                    <div class="row">
+                                        <div class="col-sm-6">
+                                            <!-- radio -->
+                                            <div class="form-group">
+                                                <div class="custom-control custom-radio">
+                                                    <input class="custom-control-input" type="radio" id="Radioday"
+                                                           name="typeDateDay">
+                                                    <label for="Radioday" class="custom-control-label">امتیاز دهی بر
+                                                        اساس روز</label>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-sm-6">
+                                            <div class="form-group">
+                                                <div class="custom-control custom-radio">
+                                                    <input class="custom-control-input" type="radio" id="Radiomonth"
+                                                           name="typeDateMonth">
+                                                    <label for="Radiomonth" class="custom-control-label">امتیاز دهی بر
+                                                        اساس ماه</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <hr>
+                                    <div class="row">
+                                        <div class="col-md-7">
+                                            <div class="form-group">
+                                                <label for="dayInput">روز : </label>
+                                                <input type="date" name="day" id="dayInput" disabled>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-7">
+                                            <div class="form-group">
+                                                <label for="monthInput">ماه : </label>
+                                                <input type="month" name="month" id="monthInput" disabled>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row mt-3">
+                                        <div class="col-sm-3"></div>
+                                        <div class="col-sm-5">
+                                            <button type="submit" class="btn btn-block btn-success">گزارش گیری</button>
+                                        </div>
+                                        <div class="col-sm-3"></div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-8">
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">لیست کار های {{ date }}</h3>
+                            </div>
+                            <!-- /.card-header -->
+                            <div class="card-body table-responsive p-0" style="height: 300px;">
+                                <table class="table table-head-fixed">
+                                    <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>عنوان</th>
+                                        <th>توضیحات</th>
+                                        <th>شروع کار</th>
+                                        <th>پایان کار</th>
+                                        <th>انجام شده/نشده</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    {% for work in works %}
+                                        <tr>
+                                            <td>{{ forloop.counter }}</td>
+                                            <td>{{ work.title }}</td>
+                                            <td>{{ work.body|truncatewords:5 }}</td>
+                                            <td>{{ work.start_work }}</td>
+                                            <td>{{ work.end_work }}</td>
+                                            <td>
+                                                {% if work.is_finished %}
+                                                    <i class="fa fa-check" style="color:green;"></i>
+                                                {% else %}
+                                                    <i class="fa fa-close" style="color:red;"></i>
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                            <!-- /.card-body -->
+
+                            <div class="card-footer d-flex align-items-baseline">
+                                {% if not score.rate %}
+                                    <h3 class="card-title">ثبت امتیاز برای تاریخ {{ date }} : </h3>
+                                {% endif %}
+                                <div class="coar-tools d-flex align-items-baseline ">
+                                    {% if not score.rate %}
+                                        <div class="input-group input-group-sm" style="width: 150px;">
+                                            <form role="form" action="{% url "work:score_points" %}" method="POST"
+                                                  style="display: flex; justify-content: center; align-items: center">
+                                                {% csrf_token %}
+                                                <div class="form-group" style="display: none">
+                                                    <input type="date" id="score-day" name="day">
+                                                    <input type="month" id="score-month" name="month">
+                                                </div>
+                                                <div class="form-group mx-1">
+                                                    <input type="number" name="rate" max="100"
+                                                           style="height: 40px;width: 60px ; border-radius: 7px">
+                                                </div>
+                                                <div class="form-group">
+                                                    <input type="submit" value="ثبت امتیاز" class="btn btn-success">
+                                                </div>
+                                            </form>
+                                        </div>
+                                    {% else %}
+                                        <div class="mx-5">
+                                        <h4>امتیاز قبلی :
+                                            <span>
+                                                <a href="/work/score-detail/{{ score.id }}/"
+                                                   style="text-decoration: none;color: red" data-toggle="tooltip"
+                                                   data-placement="left" title="برای تغییر و حذف امتیاز کلیک کنید">
+                                                    {{ score.rate }}
+                                                </a>
+                                            </span>
+                                        </h4>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+{% endblock content %}
+
+{% block footer_ref %}
+    <script>
+        let radio_day = document.getElementById('Radioday');
+        let input_day = document.getElementById('dayInput');
+
+        let radio_month = document.getElementById('Radiomonth');
+        let input_month = document.getElementById('monthInput');
+
+        radio_day.addEventListener('click', function () {
+            input_day.disabled = false
+            input_month.disabled = true
+
+            if (radio_month.checked) {
+                radio_month.checked = false;
+            }
+
+        });
+
+        radio_month.addEventListener('click', function () {
+            input_month.disabled = false
+            input_day.disabled = true
+
+            if (radio_day.checked) {
+                radio_day.checked = false;
+            }
+        });
+
+        let d = {{ date }};
+        let score_day = document.getElementById('score-day');
+        let score_month = document.getElementById('score-month');
+        if (d != null) {
+            if (d.length == 7) {
+                score_month.value = d;
+            }
+            if (d.length == 10) {
+                score_day.value = d;
+            }
+        }
+        console.log(score_month.value);
+        console.log(score_day.value);
+
+    </script>
+
+    <script>
+        let text = document.querySelector("#messageAleart");
+
+        let timer = setTimeout(() => {
+            text.remove()
+        }, 3600);
+    </script>
+{% endblock %}

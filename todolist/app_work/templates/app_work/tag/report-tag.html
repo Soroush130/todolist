@@ -1,0 +1,180 @@
+{% extends 'shared/_MainLayout.html' %}
+
+{% block header_ref %}
+<style>
+  ul, #myUL {
+      list-style-type: none;
+  }
+
+  #myUL {
+      margin: 0;
+      padding: 0;
+  }
+
+  .caret {
+      cursor: pointer;
+      -webkit-user-select: none; /* Safari 3.1+ */
+      -moz-user-select: none; /* Firefox 2+ */
+      -ms-user-select: none; /* IE 10+ */
+      user-select: none;
+  }
+
+  .caret::before {
+      content: "\25C0";
+      color: black;
+      display: inline-block;
+      margin-left: 6px;
+  }
+
+  .caret-down::before {
+      -ms-transform: rotate(-90deg); /* IE 9 */
+      -webkit-transform: rotate(-90deg); /* Safari */'
+      transform: rotate(-90deg);
+  }
+
+  .nested {
+      display: none;
+  }
+
+  .active {
+      display: block;
+  }
+</style>
+{%endblock %}
+
+
+{% block content %}
+
+<div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <div class="content-header">
+      <div class="container-fluid">
+        <div class="row mb-2">
+          <div class="col-sm-6">
+            <h1 class="m-0 text-dark">گزارشگیری بر اساس تگ ها</h1>
+          </div>
+  
+          <div class="col-sm-6">
+            <ol class="breadcrumb float-sm-right">
+              <li class="breadcrumb-item"><a href="/">خانه</a></li>
+              <li class="breadcrumb-item active">گزارش تگ ها</li>
+            </ol>
+          </div>
+        </div>
+      </div>
+    </div>
+  
+    <!-- Main content -->
+    <section class="content">
+      <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-4">
+                <form action="" method="POST">
+                    {% csrf_token %}
+                    <div class="card">
+                        <div class="card-header">
+                          <h3 class="card-title float-left">لیست تگ های شما</h3>
+                        </div>
+                        <!-- /.card-header -->
+                        <div class="card-body table-responsive p-0" style="height: 300px;">
+                          <table class="table table-striped">
+                            <thead>
+                              <tr>
+                                <th >#</th>
+                                <th>عنوان</th>
+                                <th >انتخاب شده/نشده</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                                {% for tag in tags %}
+                                    <tr>
+                                        <td>{{forloop.counter}}</td>
+                                        <td>{{tag.title}}</td>
+                                        <td>
+                                            <input type="checkbox" name="tags" id="tag{{tag.id}}" value="{{tag.id}}">
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                          </table>
+                        </div>
+                        <!-- /.card-body -->
+                    </div>
+                    <input type="submit" class="btn btn-block btn-success" value="گزارشگیری">
+                </form>
+            </div>
+
+
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header">
+                      
+      
+                      <div class="card-tools">
+                        <h3 class="card-title">لیست کار ها بر اساس تگ های انتخابی</h3>
+                      </div>
+                    </div>
+                    <!-- /.card-header -->
+                    <div style="height: 300px;" class="card-body table-responsive p-0">
+                      <table class="table table-head-fixed">
+                        <thead>
+                          <tr>
+                            <th>#</th>
+                            <th>عنوان</th>
+                            <th>توضیحات</th>
+                            <th>تکمیل شده/نشده</th>
+                            <th>زیر دسته</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                            {% for work in works %}
+                                <tr>
+                                    <td>{{forloop.counter}}</td>
+                                    <td>{{work.title}}</td>
+                                    <td>{{work.body|truncatewords:5}}</td>
+                                    <td>
+                                      {% if work.is_finished %}
+                                        <i class="fa fa-check-circle" style='color:green;'></i>
+                                      {% else %}
+                                        <i class="fa fa-close" style='color:red;'></i>
+                                      {% endif %}
+                                    </td>
+                                    <td>
+                                      {% for tag in work.tag.all %}
+                                        {{tag.title}} {% if not forloop.last %}-{% endif %} 
+                                      {% endfor %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                      </table>
+                    </div>
+                    <!-- /.card-body -->
+                  </div>
+            </div>
+      
+
+        </div>
+
+
+    </section>
+  </div>
+  
+
+{% endblock content %}
+
+
+{% block footer_ref %}
+<script>
+    var toggler = document.querySelectorAll(".caret");
+    var i;
+  
+    for (i = 0; i < toggler.length; i++) {
+    toggler[i].addEventListener("click", function() {
+        this.parentElement.querySelector(".nested").classList.toggle("active");
+        this.classList.toggle("caret-down");
+    });
+    }
+  </script>
+
+{% endblock footer_ref %}

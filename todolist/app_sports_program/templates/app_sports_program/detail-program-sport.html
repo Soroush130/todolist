@@ -1,0 +1,83 @@
+{% extends 'shared/_MainLayout.html' %}
+
+{% block content %}
+
+<div class="content-wrapper" style="min-height: 1017.2px;">
+    <section class="content-header">
+      <div class="container-fluid">
+        <div class="row mb-2">
+          <div class="col-sm-6">
+            <h1>جزییات برنامه ورزشی</h1>
+          </div>
+          <div class="col-sm-6">
+            <ol class="breadcrumb float-sm-right">
+              <li class="breadcrumb-item"><a href="/">خانه</a></li>
+              <li class="breadcrumb-item active">برنامه ورزشی</li>
+            </ol>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Main content -->
+    <section class="content">
+      <div class="container-fluid">
+
+        <div class="row">
+          <div class="col-12">
+            <div class="card">
+              <div class="card-header">
+                <h3 class="card-title float-left">{{program.titel}}</h3>
+
+              </div>
+              <!-- /.card-header -->
+              <div class="card-body table-responsive p-0">
+                <table class="table table-hover">
+                  <thead>
+                    <tr>
+                      <th>#</th>
+                      <th>عنوان</th>
+                      <th>توضیحات</th>
+                      <th>تعداد دفعات</th>
+                      <th>تعداد تکرار ها</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+
+                    {% for item in program.item.all %}
+                    
+                        <tr>
+                            <td>{{forloop.counter}}</td>
+                            <td>{{item.title}}</td>
+                            <td>
+                                {% if item.body %}
+                                    {{item.body}}
+                                {%else%}
+                                    ندارد
+                                {% endif %}
+                            </td>
+                            <td>
+                                {{item.count}}
+                            </td>
+                            <td>
+                                {{item.repeat_count}}
+                            </td>
+                        </tr>
+  
+
+                    {% endfor %}
+
+                  </tbody>
+                </table>
+              </div>
+              <!-- /.card-body -->
+            </div>
+            <!-- /.card -->
+          </div>
+        </div>
+
+      </div>
+    </section>
+  </div>
+
+{% endblock content %}

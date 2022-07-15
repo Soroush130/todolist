@@ -1,0 +1,162 @@
+{% extends 'shared/_MainLayout.html' %}
+
+{% block header_ref %}
+    <style>
+        #messageAleart {
+            position: absolute;
+            left: 1%;
+            top: 8%;
+            z-index: 2000;
+            width: 300px;
+            height: 80px;
+            display: flex;
+            justify-content: start;
+            flex-direction: row;
+            align-items: center;
+            border-radius: 20px;
+        }
+    </style>
+{% endblock header_ref %}
+
+{% block content %}
+
+{% if messages %}
+    {% for message in messages %}
+        <div id='messageAleart' class='bg-{{ message.tags }}' style='opacity: 0.8;'>
+            {% if message.tags == 'success' %}
+                <i class='fa fa-check ml-3' style='font-size:35px;'></i>
+            {% elif message.tags == 'danger' %}
+                <i class='fa fa-close ml-3' style='font-size:35px;'></i>
+            {% endif %}
+            <h5 class='mx-2' style=''>{{ message }}</h5>
+        </div>
+    {% endfor %}
+{% endif %}
+
+<div class="content-wrapper" style="min-height: 1017.2px;">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+      <div class="container-fluid">
+        <div class="row mb-2">
+          <div class="col-sm-6">
+            <h1>برنامه شخصی سازی شده</h1>
+          </div>
+          <div class="col-sm-6">
+            <ol class="breadcrumb float-sm-right">
+              <li class="breadcrumb-item"><a href="/">خانه</a></li>
+              <li class="breadcrumb-item active">برنامه شخصی</li>
+            </ol>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="content">
+      <div class="container-fluid">
+        <div class="row">
+
+
+          <div class="col-md-6">
+
+
+            <div class="card card-primary">
+              <div class="card-header">
+                <h3 class="card-title float-left">برنامه جدید</h3>
+              </div>
+              <!-- /.card-header -->
+              <!-- form start -->
+                <form role="form" action="{% url 'sport_program:new_customize_program' %}" method="POST">
+                    {% csrf_token %}
+                    {% comment %} {{form.as_p}} {% endcomment %}
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label for="inputTitle">عنوان : </label>
+                            <input type="text" name="titel" class="form-control" id="inputTitle" placeholder="">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="inputItems">آیتم ها : </label>
+                            <select name="item" class="form-control" id="inputItems" multiple="">
+                                {% for item in items %}
+                                    <option value="{{item.id}}">{{item.title}}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="card-footer">
+                    <button type="submit" class="btn btn-primary">ثبت</button>
+                    </div>
+                </form>
+            </div>
+
+          </div>
+        
+
+          <div class="col-md-6">
+            <div class="card card-primary">
+                <div class="card-header">
+                  <h3 class="card-title float-left">آیتم جدید</h3>
+                </div>
+                <!-- /.card-header -->
+                <!-- form start -->
+                <form role="form" action="{% url 'sport_program:new_customize_item' %}" method="POST">
+                    {% csrf_token %}
+                  <div class="card-body">
+  
+  
+                    <div class="form-group">
+                      <label for="inputTitle">عنوان : </label>
+                      <input type="text" name="title" class="form-control" id="inputTitle" placeholder="">
+                    </div>
+  
+                    <div class="form-group">
+                        <label for="inputBody">توضیحات : </label>
+                        <textarea class="form-control" name="body" id="inputBody" rows="3" placeholder="Enter ..."></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="inputTitle">تعداد : </label>
+                        <input type="number" name="count" class="form-control" id="inputTitle" placeholder="" min="0">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="inputTitle">تعداد تکرار : </label>
+                        <input type="text" name="repeat_count" class="form-control" id="inputTitle" placeholder="">
+                    </div>
+  
+  
+                  </div>
+                  <!-- /.card-body -->
+  
+                  <div class="card-footer">
+                    <button type="submit" class="btn btn-primary">ثبت</button>
+                  </div>
+                </form>
+              </div>
+
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+
+{% endblock content %}
+
+
+{% block footer_ref %}
+
+
+<script>
+
+    let text = document.querySelector("#messageAleart");
+
+    let timer = setTimeout(() => {
+        text.remove()
+    }, 3600);
+
+</script>
+
+
+{% endblock footer_ref %}

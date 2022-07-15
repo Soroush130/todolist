@@ -1,0 +1,240 @@
+{% extends 'shared/_MainLayout.html' %} {% load static %}
+
+{% block header_ref %}
+    <style>
+        #messageAleart {
+            position: absolute;
+            left: 1%;
+            top: 8%;
+            z-index: 2000;
+            width: 300px;
+            height: 80px;
+            display: flex;
+            justify-content: start;
+            flex-direction: row;
+            align-items: center;
+            border-radius: 20px;
+        }
+    </style>
+{% endblock header_ref %}
+
+{% block content %}
+
+    {% if messages %}
+        {% for message in messages %}
+            <div id='messageAleart' class='bg-{{ message.tags }}' style='opacity: 0.8;'>
+                {% if message.tags == 'success' %}
+                    <i class='fa fa-check ml-3' style='font-size:35px;'></i>
+                {% elif message.tags == 'danger' %}
+                    <i class='fa fa-close ml-3' style='font-size:35px;'></i>
+                {% endif %}
+                <h5 class='mx-2' style=''>{{ message }}</h5>
+            </div>
+        {% endfor %}
+    {% endif %}
+
+
+    <div class="content-wrapper">
+        <!-- Content Header (Page header) -->
+        <div class="content-header">
+            <div class="container-fluid">
+                <div class="row mb-2">
+                    <div class="col-sm-6">
+                        <h1 class="m-0 text-dark">یادآوری ها</h1>
+                    </div>
+
+                    <div class="col-sm-6">
+                        <ol class="breadcrumb float-sm-right">
+                            <li class="breadcrumb-item"><a href="/">خانه</a></li>
+                            <li class="breadcrumb-item active">لیست یادآوری ها</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main content -->
+        <section class="content">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="card card-primary">
+                            <div class="card-header">
+                                <h3 class="card-title float-left">یادآوری جدید </h3>
+                            </div>
+                            <!-- /.card-header -->
+                            <!-- form start -->
+                            <form role="form" action="{% url 'reminder:add_reminder' %}" method="POST">
+                                {% csrf_token %}
+                                <div class="card-body">
+
+                                    <div class="form-group">
+                                        <label for="exampleInputTitle">عنوان :</label>
+                                        <input
+                                                type="text"
+                                                name="title"
+                                                class="form-control"
+                                                id="exampleInputTitle"
+                                                placeholder="تولد, جلسه کاری و ..."
+                                        />
+                                    </div>
+                                    <div class="form-group">
+                                        <label>توضیحات : </label>
+                                        <textarea class="form-control" name="body" rows="3"
+                                                  placeholder="توضیحات خورد را وارد کنید"></textarea>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="InputStartWork">تاریخ : </label>
+                                        <input type="date" class="form-control" name="date"
+                                               id="InputStartWork">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="InputFinishWork">زمان : </label>
+                                        <input type="time" class="form-control" name="time"
+                                               id="InputFinishWork">
+                                    </div>
+                                </div>
+                                <div class="card-footer">
+                                    <button type="submit" class="btn btn-primary">ثبت</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+
+                    <!-- /.col -->
+                    <div class="col-md-8">
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">لیست یادآوری ها</h3>
+
+                            </div>
+                            <!-- /.card-header -->
+                            <div class="card-body table-responsive p-0" style="height: 300px;">
+                                <table class="table table-head-fixed">
+                                    <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>عنوان</th>
+                                        <th>توضیحات</th>
+                                        <th>تاریخ</th>
+                                        <th>زمان</th>
+                                        <th>وضیعت</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    {% for reminder in reminders %}
+                                        <tr>
+                                            <td>{{ forloop.counter }}</td>
+                                            <td>{{ reminder.title}}</td>
+                                            <td>{{ reminder.body|truncatewords:5 }}</td>
+                                            <td class="date-reminder">
+                                                {% if reminder.date %}
+                                                    {{ reminder.date }}
+                                                {% else %}
+                                                    -
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                {% if reminder.time %}
+                                                    {{ reminder.time }}
+                                                {% else %}
+                                                    -
+                                                {% endif %}
+                                            </td>
+                                            <td class="status-reminder">
+                                                نامشخص
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                            <!-- /.card-body -->
+                        </div>
+                    </div>
+                    <!-- /.col -->
+                </div>
+            </div>
+        </section>
+    </div>
+
+{% endblock %}
+
+
+
+{% block footer_ref %}
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+    <script>
+
+        var inputs_chek = document.querySelectorAll('input[type="checkbox"]');
+        for (let i = 0; i < inputs_chek.length; i++) {
+            let item = inputs_chek[i];
+            item.addEventListener('click', myFunc)
+        }
+
+        function myFunc(e) {
+            var id;
+            id = this.getAttribute('data-catid');
+            $.ajax({
+                type: "GET",
+                url: "{% url 'work:check_work' %}",
+                data: {work_id: id},
+                // on success
+                success: function (response) {
+                    if (response.is_finished == true) {
+                        console.log('Done Work')
+                    } else {
+                        console.log('Not Done Work')
+                    }
+                },
+                // on error
+                error: function (response) {
+                    // alert the error if any error occured
+                    console.log(response)
+                }
+            });
+        }
+
+    </script>
+
+
+    <script>
+
+        let text = document.querySelector("#messageAleart");
+
+        let timer = setTimeout(() => {
+            text.remove()
+        }, 3600);
+
+    </script>
+
+    <script>
+        let status_reminder = document.querySelectorAll('.status-reminder');
+        let date_reminder = document.querySelectorAll('.date-reminder');
+        
+        
+        var d = new Date();  // Sat Jul 02 2022 19:44:03 GMT-0700 (Pacific Daylight Time)
+        var date_now = d.toLocaleDateString()
+        var [month_now, day_now, year_now] = date_now.split('/');
+        [month_now, day_now, year_now] = [parseInt(month_now), parseInt(day_now), parseInt(year_now)]
+
+        for(let i=0; i<status_reminder.length; i++){
+            let reminder = status_reminder[i];
+            let content_reminder = date_reminder[i].innerHTML;
+            let reminder_date = new Date(content_reminder);
+            var [month, day, year] = reminder_date.toLocaleDateString().split('/');
+            [month, day, year] = [parseInt(month), parseInt(day), parseInt(year)]
+            if(year < year_now || month < month_now || day < day_now){
+                status_reminder[i].innerHTML = `
+                    <i class="fa fa-check" style="color:green;"></i>
+                `
+            }
+        }
+    </script>
+
+
+{% endblock footer_ref %}

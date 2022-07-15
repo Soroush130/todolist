@@ -1,0 +1,178 @@
+{%extends 'shared/_MainLayout.html'%} {%load static%} {% block header_ref %}
+<style>
+  ul, #myUL {
+      list-style-type: none;
+  }
+
+  #myUL {
+      margin: 0;
+      padding: 0;
+  }
+
+  .caret {
+      cursor: pointer;
+      -webkit-user-select: none; /* Safari 3.1+ */
+      -moz-user-select: none; /* Firefox 2+ */
+      -ms-user-select: none; /* IE 10+ */
+      user-select: none;
+  }
+
+  .caret::before {
+      content: "\25C0";
+      color: black;
+      display: inline-block;
+      margin-left: 6px;
+  }
+
+  .caret-down::before {
+      -ms-transform: rotate(-90deg); /* IE 9 */
+      -webkit-transform: rotate(-90deg); /* Safari */'
+      transform: rotate(-90deg);
+  }
+
+  .nested {
+      display: none;
+  }
+
+  .active {
+      display: block;
+  }
+
+  #messageAleart{
+    position: absolute;
+    left:1%;
+    top:8%;
+    z-index: 2000;
+    width: 300px;
+    height: 80px;
+    display: flex;
+    justify-content: start;
+    flex-direction:row;
+    align-items: center;
+    border-radius:20px;
+  }
+</style>
+{%endblock %}
+
+
+{%block content%}
+
+{% if messages %}
+  {% for message in messages %}
+    <div id='messageAleart' class='bg-{{ message.tags }}' style='opacity: 0.8;'>
+      {% if message.tags == 'success' %}
+        <i class='fa fa-check ml-3' style='font-size:35px;'></i>
+      {% elif message.tags == 'danger' %}
+        <i class='fa fa-close ml-3' style='font-size:35px;'></i>
+      {% endif %}
+      <h5 class='mx-2' style=''>{{message}}</h5>
+    </div>
+  {% endfor %}
+{% endif %}
+
+<div class="content-wrapper">
+  <!-- Content Header (Page header) -->
+  <div class="content-header">
+    <div class="container-fluid">
+      <div class="row mb-2">
+        <div class="col-sm-6">
+          <h1 class="m-0 text-dark">لیست تگ ها</h1>
+        </div>
+
+        <div class="col-sm-6">
+          <ol class="breadcrumb float-sm-right">
+            <li class="breadcrumb-item"><a href="/">خانه</a></li>
+            <li class="breadcrumb-item active">تگ ها</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main content -->
+  <section class="content">
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-md-5 connectedSortable ui-sortable">
+          <div class="card card-primary">
+            <div class="card-header">
+              <h3 class="card-title float-left">تگ جدید</h3>
+            </div>
+            <!-- /.card-header -->
+            <!-- form start -->
+            <form role="form" action='/work/add-tag/' method='POST'>
+                {% csrf_token %}
+                <div class="card-body">
+                    <div class="form-group">
+                        <label>دسته : </label>
+                        <select class="form-control" name='parent'>
+                            <option value='' selected=''>------------------</option>
+                            {% for tag in tags %}
+                                <option value="{{tag.id}}">{{tag.title}}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="InputTag">عنوان</label>
+                        <input
+                            type="text"
+                            name='title'
+                            class="form-control"
+                            id="InputTag"
+                            placeholder="نام تگ مورد نطر را وارد کنید"
+                        />
+                    </div>
+                </div>
+
+              <div class="card-footer">
+                <button type="submit" class="btn btn-primary">Submit</button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <div class="col-md-7">
+          <ul id="myUL">
+            {% for tag in tags %}
+                {% if tag.parent == None %}
+                    <li>
+                    <span class="caret">{{tag.title}}</span>
+                    {% if tag.children.all %}
+                        {% include 'app_work/tag/tags-category-loop.html' %}
+                    {% endif %}
+                    </li>
+                    <hr />
+                {% endif %}
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+{%endblock%}
+
+{% block footer_ref %}
+
+<script>
+  var toggler = document.querySelectorAll(".caret");
+  var i;
+
+  for (i = 0; i < toggler.length; i++) {
+  toggler[i].addEventListener("click", function() {
+      this.parentElement.querySelector(".nested").classList.toggle("active");
+      this.classList.toggle("caret-down");
+  });
+  }
+</script>
+
+<script>  
+
+  let text = document.querySelector("#messageAleart");
+
+  let timer = setTimeout(() => {text.remove()}, 3600);
+
+</script>
+
+{% endblock %}

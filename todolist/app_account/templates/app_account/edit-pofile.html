@@ -1,0 +1,146 @@
+{% extends 'shared/_MainLayout.html' %}
+
+
+{% block header_ref %}
+    <style>
+        #messageAleart {
+            position: absolute;
+            left: 1%;
+            top: 8%;
+            z-index: 2000;
+            width: 300px;
+            height: 80px;
+            display: flex;
+            justify-content: start;
+            flex-direction: row;
+            align-items: center;
+            border-radius: 20px;
+        }
+    </style>
+{% endblock header_ref %}
+
+
+
+
+{% block content %}
+
+{% if messages %}
+    {% for message in messages %}
+        <div id='messageAleart' class='bg-{{ message.tags }}' style='opacity: 0.8;'>
+            {% if message.tags == 'success' %}
+                <i class='fa fa-check ml-3' style='font-size:35px;'></i>
+            {% elif message.tags == 'danger' %}
+                <i class='fa fa-close ml-3' style='font-size:35px;'></i>
+            {% endif %}
+            <h5 class='mx-2' style=''>{{ message }}</h5>
+        </div>
+    {% endfor %}
+{% endif %}
+
+
+<div class="content-wrapper" style="min-height: 1233.2px;">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+      <div class="container-fluid">
+        <div class="row mb-2">
+          <div class="col-sm-6">
+            <h1>پروفایل</h1>
+          </div>
+          <div class="col-sm-6">
+            <ol class="breadcrumb float-sm-right">
+              <li class="breadcrumb-item"><a href="/">خانه</a></li>
+              <li class="breadcrumb-item active">ویرایش اطلاعات</li>
+            </ol>
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+    <section class="content">
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-md-3">
+            <div class="card card-primary card-outline">
+              <div class="card-body box-profile">
+
+                <h3 class="profile-username text-center">{{profile.username}}</h3>
+
+                <ul class="list-group list-group-unbordered mb-3">
+                  <li class="list-group-item">
+                    <b>ایمیل : </b> <a class="float-right">{{profile.email}}</a>
+                  </li>
+                  <li class="list-group-item">
+                    <b>نام : </b> <a class="float-right">{{profile.first_name}}</a>
+                  </li>
+                  <li class="list-group-item">
+                    <b>نام خانوادگی : </b> <a class="float-right">{{profile.last_name}}</a>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+            <div class="col-md-9">
+                <div class="card card-primary">
+                    <div class="card-header">
+                      <h3 class="card-title float-left">ویرایش اطلاعات</h3>
+                    </div>
+                    <!-- /.card-header -->
+                    <!-- form start -->
+                    <form role="form" action='' method="POST">
+                        {% csrf_token %}
+                      <div class="card-body">
+                        <div class="form-group">
+                          <label for="InputUsername">نام کاربری : </label>
+                          <input type="text" name="username" class="form-control" id="InputUsername" placeholder="انگلیسی باشد" value="{{profile.username}}">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="InputEmail">ایمیل : </label>
+                            <input type="email" name="email" class="form-control" id="InputEmail" placeholder="" value="{{profile.email}}">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="InputFirstName">نام : </label>
+                            <input type="text" name="first_name" class="form-control" id="InputFirstName" placeholder="" value="{{profile.first_name}}">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="InputLastName">نام خانوادگی : </label>
+                            <input type="text" name="last_name" class="form-control" id="InputLastName" placeholder="" value="{{profile.last_name}}">
+                        </div>
+                      </div>
+      
+                      <div class="card-footer">
+                        <button type="submit" class="btn btn-primary">ثبت</button>
+                      </div>
+                    </form>
+                  </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+  </div>
+
+
+{% endblock content %}
+
+
+
+
+
+{% block footer_ref %}
+
+    <script>
+
+        let text = document.querySelector("#messageAleart");
+
+        let timer = setTimeout(() => {
+            text.remove()
+        }, 3600);
+
+    </script>
+
+{% endblock footer_ref %}

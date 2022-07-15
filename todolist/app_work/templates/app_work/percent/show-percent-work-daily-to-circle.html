@@ -1,0 +1,164 @@
+{% extends 'shared/_MainLayout.html' %}
+
+{% block header_ref %}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.8.0/chart.min.js" integrity="sha512-sW/w8s4RWTdFFSduOTGtk4isV1+190E/GghVffMA9XczdJ2MDzSzLEubKAs5h0wzgSJOQTRYyaz73L3d6RtJSg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+{% endblock header_ref %}
+
+{% block content %}
+
+
+<div class="content-wrapper" style="min-height: 608px;">
+    <!-- Content Header (Page header) -->
+    <div class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1 class="m-0 text-dark">درصد میزان انجام فعالیت های روزانه</h1>
+            </div>
+
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                <li class="breadcrumb-item"><a href="/">خانه</a></li>
+                <li class="breadcrumb-item active">گزارشگیری روزانه</li>
+                </ol>
+            </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main content -->
+    <section class="content">
+        <div class="container-fluid">
+
+            <div class="row">
+                <div class="col-lg-5">
+                    <div class="card card-primary">
+                        <div class="card-header">
+                        <h3 class="card-title float-left">تاریخ مد نظر خود را انتخاب کنید</h3>
+                        </div>
+                            <div class="card-body">
+                                <div class="form-group">
+                                <label for="inputDate">تاریخ : </label>
+                                <input type="date" class="form-control" id="inputDate" name="date">
+                                </div>
+                            </div>
+                            <!-- /.card-body -->
+            
+                            <div class="card-footer">
+                                <button type="button" id='getReport' class="btn btn-primary">گزارش</button>
+                            </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-7">
+                    <div class="card">
+                        <div class="card-header">
+                          <h3 class="card-title"></h3>
+        
+                        </div>
+                        <div class="card-body d-flex justify-content-center align-items-center" >
+                          <div class="text-center">
+                            <canvas id="myChart" style="width: 400px;height: 400px;"></canvas>
+                          </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+</div>
+
+
+
+{% endblock content %}
+
+
+{% block footer_ref %}
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+<script>
+    
+    let button_get_report = document.querySelector("#getReport");
+    let input_date = document.querySelector('#inputDate');
+    button_get_report.addEventListener("click", GetREport);
+
+    
+    function GetREport(){
+        let val = input_date.value;
+        $.ajax({
+            type: "GET",
+            url: "{% url 'work:calc_percent_to_circle' %}",
+            data: {value_date: val},
+            // on success
+            success: function (response) {
+                if (response.resulte == true) {
+                    let percents = response.percents;
+                    let works_name = response.works_name;
+
+                    let background_color = [];
+                    let border_color = [];
+                    const ctx = document.getElementById('myChart').getContext('2d');
+
+                    for(let i=0; i<works_name.length;i++){
+
+                        let color_values = [];
+                        for(let i=0; i<percents.length;i++){
+                            let value = generate_number_random()
+                            color_values.push(value)
+                        };
+                        let result_one = 'rgba'+'('+color_values[0]+','+color_values[1]+','+color_values[2]+','+0.2+')';
+                        let result_two = 'rgba'+'('+color_values[0]+','+color_values[1]+','+color_values[2]+','+1+')';
+                        background_color.push(result_one)
+                        border_color.push(result_two)
+                    };
+
+                    const myChart = new Chart(ctx, {
+                        type: 'doughnut',
+                        data: {
+                            labels: works_name,
+                            datasets: [{
+                                label: '',
+                                data: percents,
+                                backgroundColor: background_color,
+                                borderColor: border_color,
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {
+                            scales: {
+                                y: {
+                                    beginAtZero: true
+                                }
+                            }
+                        }
+                    });
+                
+                } else {
+                    console.log('Not Done Work')
+                }
+            },
+            // on error
+            error: function (response) {
+                // alert the error if any error occured
+                console.log(response)
+            }
+        });
+    };
+
+
+    function generate_number_random() {
+        let number_random = Math.floor(Math.random()*256)
+        return number_random
+    }
+
+
+
+</script>
+
+<script>
+
+</script>
+
+{% endblock footer_ref %}

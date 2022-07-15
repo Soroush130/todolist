@@ -1,0 +1,164 @@
+{% extends 'shared/_MainLayout.html' %}
+
+{% block header_ref %}
+    <style>
+        #messageAleart{
+            position: absolute;
+            left:1%;
+            top:8%;
+            z-index: 2000;
+            width: 300px;
+            height: 80px;
+            display: flex;
+            justify-content: start;
+            flex-direction:row;
+            align-items: center;
+            border-radius:20px;
+        }
+    </style>
+{% endblock header_ref %}
+
+{% block content %}
+
+{% if messages %}
+  {% for message in messages %}
+    <div id='messageAleart' class='bg-{{ message.tags }}' style='opacity: 0.8;'>
+      {% if message.tags == 'success' %}
+        <i class='fa fa-check ml-3' style='font-size:35px;'></i>
+      {% elif message.tags == 'danger' %}
+        <i class='fa fa-close ml-3' style='font-size:35px;'></i>
+      {% endif %}
+      <h5 class='mx-2' style=''>{{message}}</h5>
+    </div>
+  {% endfor %}
+{% endif %}
+
+<!-- Content Wrapper. Contains page content -->
+<div class="content-wrapper">
+
+    <!-- Content Header (Page header) -->
+    <div class="content-header">
+      <div class="container-fluid">
+        <div class="row mb-2">
+          <div class="col-sm-6">
+            <h1 class="m-0 text-dark">تعداد لیوان های آب روزانه</h1>
+          </div>
+  
+          <div class="col-sm-6">
+            <ol class="breadcrumb float-sm-right">
+              <li class="breadcrumb-item"><a href="/">خانه</a></li>
+              <li class="breadcrumb-item active">تعداد لیوان</li>
+            </ol>
+          </div>
+        </div>
+      </div>
+    </div>
+  
+    <!-- Main content -->
+    <section class="content">
+      <div class="container-fluid">
+  
+        <div class="row">
+
+          <div class="col-md-4">
+            <div class="card card-primary">
+              <!-- /.card-header -->
+              <!-- form start -->
+              <form action="{% url 'water:add_galss_water' %}" method="POST">
+                {% csrf_token %}
+                {% comment %} {{form}} {% endcomment %}
+                <div class="card-body">
+
+                  <div class="form-group">
+                    <label for="InputWater">* تعداد لیوان آب : </label>
+                    <input name="count" type="number" class="form-control" id="InputWater" placeholder="لیوان آب" min="0">
+                  </div>
+
+                  <div class="form-group" >
+                    <input name="date" type="date" class="form-control" id="datewater">
+                  </div>
+
+                </div>
+
+                <div class="card-footer">
+                  <button type="submit" class="btn btn-primary" id='createButton'>ثبت</button>
+                </div>
+              </form>
+            </div>
+          </div>
+  
+
+          <div class="col-md-8">
+              <div class="card">
+                <div class="card-header">
+                  <h3 class="card-title float-left">لیست روز های ثبت شده</h3>
+                </div>
+                <!-- /.card-header -->
+                <div class="card-body p-0">
+                  <table class="table">
+                    <thead>
+                      <tr>
+                        <th style="width: 10px">#</th>
+                        <th>تعداد</th>
+                        <th>تاریخ</th>
+                        <th>حذف</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {% for glass in count_glass_water %}
+                        <tr>
+                          <td>{{forloop.counter}}</td>
+                          <td>
+                            <form action="{% url 'water:edit_glass_water' glass.id %}" method="POST">
+                              {% csrf_token %}
+                              <input class="form-group" type="number" name="count" value="{{glass.count}}" min="0" style="width:60px;height:35px">
+                              
+                              <button class="btn btn-success" type="submit"><i class="fa fa-edit" style=''></i></button>
+                            </form>
+                          </td>
+                          <td>
+                            <h6>{{glass.date}}</h6>
+                          </td>
+                          <td>
+                            <h6>
+                              <a href="{% url 'water:delete_glass_water' glass.id %}" style='text-decroution:noen;'>
+                                <i class="fa fa-trash" style='color:red;'></i>
+                              </a>
+                            </h6>
+                          </td>
+                        </tr>
+                      {% endfor %}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+          </div>
+
+
+        </div>
+      </div>
+    </section>
+  </div>
+
+{% endblock content %}
+
+
+{% block footer_ref %}
+    <script>
+      let text = document.querySelector("#messageAleart");
+
+      let timer = setTimeout(() => {
+          text.remove();
+      }, 3600);
+    </script>
+
+    {% comment %} <script>
+        var input_date_water_daily = document.querySelector('#datewater');
+        var date = new Date();
+        var year = date.getFullYear();
+        var month = date.getMonth();
+        var day = date.getDate();
+        var result = year + '-' + month + '-' + day;
+        input_date_water_daily.value = result;
+    </script> {% endcomment %}
+{% endblock footer_ref %}
